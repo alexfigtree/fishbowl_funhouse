@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+    
+svg{
+    margin-left:-10px;margin-top:-8px;
+}
+path {
+  stroke: lightblue;
+}
+
+path:first-child {
+  fill: rgb(244,146,68) !important;
+}
+
+circle {
+  fill: none;
+  pointer-events: none;
+}
+
+.q0-9 { fill: rgb(98, 168, 229); }
+.q1-9 { fill: rgb(0, 170, 218); }
+.q2-9 { fill: rgb(64, 164, 223); }
+.q3-9 { fill: skyblue; }
+.q4-9 { fill: lightblue; }
+.q5-9 { fill: rgb(0, 172, 237);}
+.q6-9 { fill: rgb(0, 175, 215); }
+.q7-9 { fill: rgb(29, 202, 255); }
+.q8-9 { fill: rgb(192, 222, 237); }
+
+
+
+</style>
+</head><body>
+
+<script src="//d3js.org/d3.v3.min.js"></script>
+
+<script>
+
+var width = 514; //originally 450 960
+    height = 900 // originally 500
+ 
+
+
+var vertices = d3.range(100).map(function(d) {
+  return [Math.random() * width, Math.random() * height];
+});
+
+var voronoi = d3.geom.voronoi()
+    .clipExtent([[0, 0], [width, height]]);
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width)
+    .attr("height", height)
+    .on("mousemove", function() { vertices[0] = d3.mouse(this); redraw(); });
+
+//    
+//shape = document.getElementsByTagName("svg")[0];
+//shape.setAttribute("viewBox", "10 50 1000 1700");
+
+var path = svg.append("g").selectAll("path");
+
+svg.selectAll("circle")
+    .data(vertices.slice(1))
+  .enter().append("circle")
+    .attr("transform", function(d) { return "translate(" + d + ")"; })
+    .attr("r", 1.5);
+
+redraw();
+
+function redraw() {
+  path = path
+      .data(voronoi(vertices), polygon);
+
+  path.exit().remove();
+
+  path.enter().append("path")
+      .attr("class", function(d, i) { return "q" + (i % 9) + "-9"; })
+      .attr("d", polygon);
+
+  path.order();
+}
+
+function polygon(d) {
+  return "M" + d.join("L") + "Z";
+}
+
+</script>
+</body></html>
